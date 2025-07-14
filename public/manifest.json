@@ -1,0 +1,7 @@
+{
+  "name": "Khon Reep",
+  "short_name": "Khon Reep",
+  "description": "A simple app to drop your pin and share your location.",
+  "start_url": "/",
+  "display": "standalone"
+}
