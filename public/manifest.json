@@ -1,7 +1,21 @@
 {
-  "name": "Khon Reep",
-  "short_name": "Khon Reep",
-  "description": "A simple app to drop your pin and share your location.",
-  "start_url": "/",
-  "display": "standalone"
+	"name": "Khon Reep",
+	"short_name": "KR",
+	"icons": [
+		{
+			"src": "/app/favicon.ico/web-app-manifest-192x192.png",
+			"sizes": "192x192",
+			"type": "image/png",
+			"purpose": "maskable"
+		},
+		{
+			"src": "/app/favicon.ico/web-app-manifest-512x512.png",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "maskable"
+		}
+	],
+	"theme_color": "#ffffff",
+	"background_color": "#ffffff",
+	"display": "standalone"
 }

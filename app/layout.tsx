@@ -1,19 +1,29 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 
 export const metadata: Metadata = {
 	title: "Khon Reep",
+	manifest: "/manifest.json",
+
+	appleWebApp: {
+		capable: true,
+		statusBarStyle: "default",
+		title: "Khon Reep",
+	},
+	icons: {
+		icon: "/favicon.ico",
+		shortcut: "/apple-touch-icon.png",
+		apple: "/apple-touch-icon.png",
+	},
 };
 
-// export const viewport = {
-// 	width: "device-width",
-// 	initialScale: 1,
-// 	maximumScale: 1,
-// 	minimumScale: 1,
-// 	userScalable: false,
-// };
+export const viewport: Viewport = {
+	themeColor: "#000000",
+	width: "device-width",
+	initialScale: 1,
+};
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
