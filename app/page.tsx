@@ -111,7 +111,7 @@ export default function Home() {
 	}
 
 	return (
-		<div className="flex flex-col justify-between h-screen w-screen gap-1">
+		<div className="flex flex-col justify-between h-screen w-screen">
 			<div className="h-full">
 				<AnimatePresence mode="wait">
 					{activeTab === "pin" && (
