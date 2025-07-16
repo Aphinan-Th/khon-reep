@@ -39,7 +39,7 @@ export default function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body
-				className={`${geistSans.className} antialiased flex justify-center items-center align-middle bg-[#2196f3] bg-fixed overscroll-none`}
+				className={`${geistSans.className} antialiased flex justify-center items-center align-middle bg-blue-400 bg-fixed w-screen h-screen overscroll-none`}
 			>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
 					{children}
