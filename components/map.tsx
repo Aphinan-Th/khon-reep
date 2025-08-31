@@ -10,53 +10,53 @@ import { PIN_TYPE } from "@/constants/enum";
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 
 export interface Location {
-	id: string;
-	latitude: number;
-	longitude: number;
-	created_at?: string;
-	updated_at?: string;
-	user_agent?: string;
-	type: PIN_TYPE;
-	ip_address?: string;
+  id: string;
+  latitude: number;
+  longitude: number;
+  created_at?: string;
+  updated_at?: string;
+  user_agent?: string;
+  type: PIN_TYPE;
+  ip_address?: string;
 }
 
 const TYPE_CONFIG: Record<PIN_TYPE, { color: string; desc: string; message: string; borderColor: string }> = {
-	[PIN_TYPE.SIDEWALK_OR_MOTORBIKE]: {
-		color: "#16a34a",
-		borderColor: "white",
-		desc: "Motorbike on Sidewalk",
-		message: "🚗 Motorbike reported on sidewalk!",
-	},
-	[PIN_TYPE.ZEBRA_CROSSING_MISUSE]: {
-		color: "#2563eb",
-		borderColor: "white",
-		desc: "Zebra Crossing Misuse",
-		message: "🚶 Zebra crossing misuse detected!",
-	},
-	[PIN_TYPE.WRONG_DIRECTION]: {
-		color: "#facc15",
-		borderColor: "#4f4f4f",
-		desc: "Wrong Direction",
-		message: "↔️ Wrong direction driving!",
-	},
-	[PIN_TYPE.TRAFFIC_LIGHT_BLINDNESS]: {
-		color: "#dc2626",
-		borderColor: "white",
-		desc: "Traffic Light Blindness",
-		message: "🚦 Traffic light blindness incident!",
-	},
+  [PIN_TYPE.SIDEWALK_OR_MOTORBIKE]: {
+    color: "#16a34a",
+    borderColor: "white",
+    desc: "Motorbike on Sidewalk",
+    message: "🚗 Motorbike reported on sidewalk!",
+  },
+  [PIN_TYPE.ZEBRA_CROSSING_MISUSE]: {
+    color: "#2563eb",
+    borderColor: "white",
+    desc: "Zebra Crossing Misuse",
+    message: "🚶 Zebra crossing misuse detected!",
+  },
+  [PIN_TYPE.WRONG_DIRECTION]: {
+    color: "#facc15",
+    borderColor: "#4f4f4f",
+    desc: "Wrong Direction",
+    message: "↔️ Wrong direction driving!",
+  },
+  [PIN_TYPE.TRAFFIC_LIGHT_BLINDNESS]: {
+    color: "#dc2626",
+    borderColor: "white",
+    desc: "Traffic Light Blindness",
+    message: "🚦 Traffic light blindness incident!",
+  },
 };
 
 const getTypeConfig = (type: PIN_TYPE) =>
-	TYPE_CONFIG[type] || {
-		color: "#ec4899",
-		desc: "Unknown",
-		message: "⚠️ Unknown event type.",
-	};
+  TYPE_CONFIG[type] || {
+    color: "#ec4899",
+    desc: "Unknown",
+    message: "⚠️ Unknown event type.",
+  };
 
 const getVehicleIconHtml = (type: PIN_TYPE) => {
-	const { color, borderColor } = getTypeConfig(type);
-	return `
+  const { color, borderColor } = getTypeConfig(type);
+  return `
 		<div style="
 			background: ${color};
 			width: 40px;
@@ -84,22 +84,22 @@ const getVehicleIconHtml = (type: PIN_TYPE) => {
 };
 
 const createVehicleIcon = (type: PIN_TYPE) =>
-	L.divIcon({
-		html: getVehicleIconHtml(type),
-		className: "custom-vehicle-marker",
-		iconSize: [40, 40],
-		iconAnchor: [20, 20],
-		popupAnchor: [0, -20],
-	});
+  L.divIcon({
+    html: getVehicleIconHtml(type),
+    className: "custom-vehicle-marker",
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
+    popupAnchor: [0, -20],
+  });
 
 interface MapProps {
-	locations: Location[];
+  locations: Location[];
 }
 
 const getPopupContent = (location: Location) => {
-	const { desc, message } = getTypeConfig(location.type);
+  const { desc, message } = getTypeConfig(location.type);
 
-	return `
+  return `
 		<div class="p-3 text-center">
 			<div class="flex items-center justify-center gap-2 mb-2">
 				<svg width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -119,43 +119,87 @@ const getPopupContent = (location: Location) => {
 };
 
 export default function Map({ locations }: MapProps) {
-	const mapRef = useRef<HTMLDivElement>(null);
-	const mapInstanceRef = useRef<L.Map | null>(null);
-	const markersRef = useRef<L.Marker[]>([]);
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
+  const markersRef = useRef<L.Marker[]>([]);
 
-	useEffect(() => {
-		const mapEl = mapRef.current;
-		if (!mapEl) return;
+  useEffect(() => {
+    const mapEl = mapRef.current;
+    if (!mapEl) return;
 
-		// Initialize map once
-		if (!mapInstanceRef.current) {
-			mapInstanceRef.current = L.map(mapEl).setView([13.7563, 100.5018], 6);
-			L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {}).addTo(mapInstanceRef.current);
-		}
+    // Initialize map once
+    if (!mapInstanceRef.current) {
+      mapInstanceRef.current = L.map(mapEl).setView([13.7563, 100.5018], 6);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {}).addTo(mapInstanceRef.current);
+    }
 
-		// Remove previous markers
-		markersRef.current.forEach((marker) => marker.remove());
-		markersRef.current = [];
+    // Remove previous markers
+    markersRef.current.forEach((marker) => marker.remove());
+    markersRef.current = [];
+    // Add markers for locations
+    if (locations.length) {
+      const markers = locations.map((loc) =>
+        L.marker([loc.latitude, loc.longitude], { icon: createVehicleIcon(loc.type) })
+          .bindPopup(getPopupContent(loc))
+          .addTo(mapInstanceRef.current!)
+      );
+      markersRef.current = markers;
 
-		// Add markers for locations
-		if (locations.length) {
-			const markers = locations.map((loc) =>
-				L.marker([loc.latitude, loc.longitude], { icon: createVehicleIcon(loc.type) })
-					.bindPopup(getPopupContent(loc))
-					.addTo(mapInstanceRef.current!)
-			);
-			markersRef.current = markers;
+      navigator.geolocation.getCurrentPosition((pos) => {
+        console.log("🏳️", pos)
+        const userLatLng: [number, number] = [pos.coords.latitude, pos.coords.longitude];
 
-			// Fit bounds to markers
-			const group = L.featureGroup(markers);
-			mapInstanceRef.current.fitBounds(group.getBounds().pad(0.1));
-		}
+        const userMarker = L.marker(userLatLng, {
+          icon: L.divIcon({
+            html: `
+                  <div style="
+                    width:20px;
+                    height:20px;
+                    border-radius:50%;
+                    background:#2563eb;
+                    border:2px solid white;
+                    animation: blink 1.2s infinite ease-in-out;
+                  ">
 
-		return () => {
-			mapInstanceRef.current?.remove();
-			mapInstanceRef.current = null;
-		};
-	}, [locations]);
+                  </div>
+                  <style>
+                    @keyframes blink {
+                      0%, 100% {
+                        opacity: 1;
+                        transform: scale(1);
+                      }
+                      50% {
+                        opacity: 0.5;
+                        transform: scale(1.2);
+                      }
+                    }
+                  </style>
+            `,
+            className: "",
+            iconSize: [20, 20],
+            iconAnchor: [10, 10],
+          }),
+        }).bindPopup("📍 You are here")
+          .openPopup();
 
-	return <div ref={mapRef} className="w-full h-full" />;
+        userMarker.addTo(mapInstanceRef.current!);
+        markers.push(userMarker);
+
+        // Fit map to include both user location + pins
+        const group = L.featureGroup([userMarker]);
+        mapInstanceRef.current!.fitBounds(group.getBounds().pad(0.1));
+      });
+
+      // Fit bounds to markers
+      // const group = L.featureGroup(markers);
+      // mapInstanceRef.current.fitBounds(group.getBounds().pad(0.1));
+    }
+
+    return () => {
+      mapInstanceRef.current?.remove();
+      mapInstanceRef.current = null;
+    };
+  }, [locations]);
+
+  return <div ref={mapRef} className="w-full h-full" />;
 }
